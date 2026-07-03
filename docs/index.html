@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>auto-skill-finder — Universal AI Skill Router</title>
+<meta name="description" content="Auto-routes any AI prompt to the best installed skill. Zero slash commands. ~75% fewer tokens. Works with Claude, Codex, Cursor, Gemini CLI, OpenCode.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Clean Professional Minimal Theme */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f9fafb;
+  --border: #e5e7eb;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --accent: #000000;
+  --accent-hover: #374151;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html { scroll-behavior: auto; }
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* Navigation */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 60px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand { font-weight: 600; font-size: 15px; }
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a { font-size: 14px; color: var(--text-muted); transition: color 0.2s; }
+.nav-links a:hover { color: var(--text-main); }
+.nav-gh {
+  font-size: 13px; font-weight: 500;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.nav-gh:hover { background: var(--bg-subtle); border-color: #d1d5db; }
+
+/* Layout */
+section { padding: 100px 0; }
+.container { max-width: 1040px; margin: 0 auto; padding: 0 2rem; }
+.divider { height: 1px; background: var(--border); margin: 0 2rem; }
+.section-tint { background: var(--bg-subtle); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+/* Typography */
+.label {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 1rem;
+}
+.section-title {
+  font-size: 2.5rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em;
+  margin-bottom: 1.25rem; color: var(--text-main);
+}
+.section-sub { font-size: 1.125rem; color: var(--text-muted); max-width: 600px; margin-bottom: 3rem; }
+
+/* Hero */
+#hero {
+  min-height: 90vh; display: flex; align-items: center; padding-top: 60px;
+}
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 500; color: var(--text-muted);
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 99px;
+  margin-bottom: 1.5rem; background: var(--bg-subtle);
+}
+.hero-title { font-size: clamp(2.5rem, 4vw, 3.5rem); }
+.hero-sub { max-width: 480px; margin-bottom: 2.5rem; }
+.hero-actions { display: flex; gap: 1rem; }
+.btn-primary {
+  padding: 10px 20px; background: var(--accent); color: #fff;
+  font-size: 14px; font-weight: 500; border-radius: 6px;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost {
+  padding: 10px 20px; border: 1px solid var(--border);
+  color: var(--text-main); font-size: 14px; font-weight: 500; border-radius: 6px;
+  transition: background 0.2s;
+}
+.btn-ghost:hover { background: var(--bg-subtle); }
+
+/* Minimal Terminal */
+.terminal {
+  background: #ffffff; border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden;
+  font-family: var(--font-mono); font-size: 13px;
+}
+.term-bar {
+  display: flex; align-items: center; gap: 6px; padding: 12px 16px;
+  border-bottom: 1px solid var(--border); background: var(--bg-subtle);
+}
+.term-dot { width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; }
+.term-title { margin-left: 10px; font-size: 12px; color: var(--text-muted); font-family: var(--font-sans); }
+.term-body { padding: 20px; color: var(--text-main); }
+.term-line { display: flex; gap: 8px; margin-bottom: 8px; opacity: 0; }
+.term-prompt { color: var(--text-muted); user-select: none; }
+.term-out { color: var(--text-muted); }
+.term-out.highlight { color: var(--text-main); font-weight: 500; }
+.term-cursor {
+  display: inline-block; width: 8px; height: 15px; background: var(--text-main);
+  vertical-align: middle; animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Stats */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+  margin-top: 5rem; border-top: 1px solid var(--border); padding-top: 3rem;
+}
+.stat-num { font-size: 2.5rem; font-weight: 600; color: var(--text-main); display: block; letter-spacing: -0.02em; }
+.stat-label { font-size: 14px; color: var(--text-muted); }
+
+/* Cards (Problems, Modes, Installs) */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.card {
+  padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg);
+}
+.card h4 { font-size: 15px; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
+.card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+/* Steps */
+.step {
+  display: flex; gap: 2rem; margin-bottom: 2.5rem;
+}
+.step-num {
+  font-size: 14px; font-family: var(--font-mono); color: var(--text-muted);
+  padding-top: 4px;
+}
+.step h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; }
+.step p { font-size: 15px; color: var(--text-muted); margin-bottom: 1rem; }
+.badge {
+  font-family: var(--font-mono); font-size: 12px; padding: 4px 8px;
+  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted);
+}
+
+/* Examples */
+.example-row {
+  display: grid; grid-template-columns: 1fr 40px 1fr; gap: 1rem; align-items: center;
+  margin-bottom: 1rem;
+}
+.ex-box {
+  padding: 16px; border: 1px solid var(--border); border-radius: 8px;
+  font-family: var(--font-mono); font-size: 13px; background: var(--bg-subtle);
+}
+.ex-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; font-family: var(--font-sans); font-weight: 500;}
+.ex-arrow { text-align: center; color: var(--text-light); }
+.ex-old { color: var(--text-muted); text-decoration: line-through; }
+.ex-new { color: var(--text-main); }
+.ex-tag { margin-top: 8px; display: inline-block; font-size: 11px; padding: 2px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); }
+
+/* Code Blocks */
+.code-block {
+  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 6px;
+  padding: 12px 16px; font-family: var(--font-mono); font-size: 13px;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin-bottom: 1rem;
+}
+.code-block code { color: var(--text-main); word-break: break-all; }
+.copy-btn {
+  background: #fff; border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px;
+  font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+}
+.copy-btn:hover { border-color: var(--text-light); color: var(--text-main); }
+
+/* Agents */
+.agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+.agent-card {
+  text-align: center; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg);
+}
+.agent-card h4 { font-size: 14px; font-weight: 500; }
+.agent-card p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+footer { padding: 3rem 0; text-align: center; color: var(--text-muted); font-size: 14px; }
+.footer-links { margin-top: 1rem; display: flex; justify-content: center; gap: 1.5rem; }
+
+@media(max-width: 768px) {
+  .hero-grid, .grid-2, .example-row { grid-template-columns: 1fr; }
+  .ex-arrow { display: none; }
+  nav .nav-links { display: none; }
+}
+
+/* Animation Utilities for GSAP */
+.gsap-fade-up { opacity: 0; transform: translateY(20px); }
+.gsap-fade-in { opacity: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">auto-skill-finder</div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#how">How it works</a>
+    <a href="#examples">Examples</a>
+    <a href="#install">Install</a>
+  </div>
+  <a class="nav-gh" href="https://github.com/prantikmedhi/auto-skill-finder" target="_blank">GitHub</a>
+</nav>
+
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div class="hero-badge gsap-fade-up">v2.1.0 — Universal Router</div>
+        <h1 class="section-title gsap-fade-up">The right skill loads automatically.</h1>
+        <p class="section-sub gsap-fade-up">Send any prompt. auto-skill-finder detects intent, picks the best installed skill, compresses it, and injects caveman mode. No slash commands. No setup per prompt.</p>
+        <div class="hero-actions gsap-fade-up">
+          <a class="btn-primary" href="#install">Install in 30s</a>
+          <a class="btn-ghost" href="https://github.com/prantikmedhi/auto-skill-finder" target="_blank">Documentation</a>
+        </div>
+      </div>
+      <div class="hero-right gsap-fade-in">
+        <div class="terminal">
+          <div class="term-bar">
+            <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+            <div class="term-title">bash — UserPromptSubmit hook</div>
+          </div>
+          <div class="term-body">
+            <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">fix the auth bug in my middleware</span></div>
+            <div class="term-line"><span class="term-out">running auto-skill-finder...</span></div>
+            <div class="term-line"><span class="term-out">&gt; intent: code</span></div>
+            <div class="term-line"><span class="term-out">&gt; mode: caveman-code</span></div>
+            <div class="term-line"><span class="term-out highlight">&gt; skill: caveman-code (score:11)</span></div>
+            <div class="term-line"><span class="term-out">done. injected context.</span></div>
+            <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd"><span class="term-cursor"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stats-row gsap-fade-up">
+      <div>
+        <span class="stat-num" data-target="95">0</span>
+        <span class="stat-label">% context skipped</span>
+      </div>
+      <div>
+        <span class="stat-num" data-target="75">0</span>
+        <span class="stat-label">% fewer output tokens</span>
+      </div>
+      <div>
+        <span class="stat-num" data-target="7">0</span>
+        <span class="stat-label">agents supported</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="problem" class="section-tint">
+  <div class="container">
+    <div class="grid-2">
+      <div class="gsap-fade-up">
+        <div class="label">The Problem</div>
+        <h2 class="section-title">Manual workflows slow you down.</h2>
+        <p class="section-sub" style="margin-bottom:0">Every AI agent has a skill system. But none auto-route. You have to type the slash command every single time.</p>
+      </div>
+      <div style="display:grid;gap:1rem;">
+        <div class="card gsap-fade-up">
+          <h4>Manual selection</h4>
+          <p>Remembering which skill exists and typing /skill-name before every prompt.</p>
+        </div>
+        <div class="card gsap-fade-up">
+          <h4>Wasted context</h4>
+          <p>Loading every skill on every prompt burns your token budget instantly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <div class="label gsap-fade-up">How it works</div>
+    <h2 class="section-title gsap-fade-up">A 4-step pipeline before generation.</h2>
+    <div style="margin-top: 4rem; max-width: 700px;">
+      <div class="step gsap-fade-up">
+        <div class="step-num">01</div>
+        <div>
+          <h3>Detect intent</h3>
+          <p>Classifies your prompt as code or chat using a fast rule-based classifier.</p>
+          <span class="badge">scripts/detect_intent.py</span>
+        </div>
+      </div>
+      <div class="step gsap-fade-up">
+        <div class="step-num">02</div>
+        <div>
+          <h3>Activate mode</h3>
+          <p>Code tasks get validation-first discipline. Chat gets terse prose.</p>
+          <span class="badge">caveman-code / caveman-chat</span>
+        </div>
+      </div>
+      <div class="step gsap-fade-up">
+        <div class="step-num">03</div>
+        <div>
+          <h3>Score &amp; Route</h3>
+          <p>Scores installed skills based on keywords and description match.</p>
+          <span class="badge">scripts/skill_finder.py</span>
+        </div>
+      </div>
+      <div class="step gsap-fade-up">
+        <div class="step-num">04</div>
+        <div>
+          <h3>Inject Context</h3>
+          <p>Compresses the matched skill instructions and passes them to the agent.</p>
+          <span class="badge">hooks/UserPromptSubmit</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="examples" class="section-tint">
+  <div class="container">
+    <div class="label gsap-fade-up">Examples</div>
+    <h2 class="section-title gsap-fade-up">Talk naturally.</h2>
+    <div style="margin-top:3rem;">
+      <div class="example-row gsap-fade-up">
+        <div class="ex-box"><div class="ex-label">Manual</div><div class="ex-old">/github-pr review this diff</div></div>
+        <div class="ex-arrow">→</div>
+        <div class="ex-box"><div class="ex-label">Auto-Routed</div><div class="ex-new">review my pull request</div><div class="ex-tag">github-pr</div></div>
+      </div>
+      <div class="example-row gsap-fade-up">
+        <div class="ex-box"><div class="ex-label">Manual</div><div class="ex-old">/jest write unit tests</div></div>
+        <div class="ex-arrow">→</div>
+        <div class="ex-box"><div class="ex-label">Auto-Routed</div><div class="ex-new">write tests for this function</div><div class="ex-tag">jest</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="container">
+    <div class="label gsap-fade-up">Installation</div>
+    <h2 class="section-title gsap-fade-up">One command.</h2>
+    <div class="grid-2" style="margin-top:3rem;">
+      <div class="card gsap-fade-up">
+        <h4 style="margin-bottom:1rem">macOS / Linux</h4>
+        <div class="code-block">
+          <code>curl -fsSL https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.sh | bash</code>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+      </div>
+      <div class="card gsap-fade-up">
+        <h4 style="margin-bottom:1rem">Windows</h4>
+        <div class="code-block">
+          <code>irm https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.ps1 | iex</code>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top:4rem;" class="gsap-fade-up">
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:1.5rem">Supported Agents</h3>
+      <div class="agents-grid">
+        <div class="agent-card"><h4>Claude Code</h4><p>Native Hooks</p></div>
+        <div class="agent-card"><h4>Cursor</h4><p>.cursor/rules/</p></div>
+        <div class="agent-card"><h4>Gemini CLI</h4><p>Manifest</p></div>
+        <div class="agent-card"><h4>Codex</h4><p>system-prompt</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div>auto-skill-finder &copy; 2026. MIT License.</div>
+    <div class="footer-links">
+      <a href="https://github.com/prantikmedhi/auto-skill-finder">GitHub</a>
+      <a href="https://github.com/prantikmedhi/auto-skill-finder/blob/main/README.md">Documentation</a>
+      <a href="https://github.com/prantikmedhi/auto-skill-finder/issues">Issues</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// Smooth Scroll (Lenis)
+const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+gsap.ticker.lagSmoothing(0);
+
+// Terminal Animation
+const termLines = document.querySelectorAll('.term-line');
+termLines.forEach((line, i) => {
+  gsap.to(line, {
+    opacity: 1, duration: 0.1, delay: 0.5 + (i * 0.3), ease: "none"
+  });
+});
+
+// Stats Counter
+ScrollTrigger.create({
+  trigger: '.stats-row',
+  start: 'top 85%',
+  once: true,
+  onEnter: () => {
+    document.querySelectorAll('.stat-num').forEach(el => {
+      const target = +el.dataset.target;
+      const suffix = target > 10 ? '%' : '';
+      gsap.to(el, {
+        textContent: target,
+        duration: 2,
+        ease: 'power4.out',
+        snap: { textContent: 1 },
+        onUpdate: function() {
+          el.innerHTML = Math.round(this.targets()[0].textContent) + suffix;
+        }
+      });
+    });
+  }
+});
+
+// Generic Fade Up Animations with Spring-like ease (Framer Motion feel)
+gsap.utils.toArray('.gsap-fade-up').forEach((elem) => {
+  gsap.to(elem, {
+    scrollTrigger: { trigger: elem, start: 'top 90%', once: true },
+    opacity: 1, y: 0, duration: 1, ease: 'expo.out'
+  });
+});
+
+gsap.utils.toArray('.gsap-fade-in').forEach((elem) => {
+  gsap.to(elem, {
+    scrollTrigger: { trigger: elem, start: 'top 90%', once: true },
+    opacity: 1, duration: 1.2, ease: 'power2.out'
+  });
+});
+
+function copyCode(btn) {
+  const code = btn.previousElementSibling.textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = originalText; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
