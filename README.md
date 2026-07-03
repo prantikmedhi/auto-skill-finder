@@ -59,21 +59,7 @@ Triggers: explain, what is, how does, summarize, compare, tell me, plan, strateg
 
 ### Detection logic
 
-```
-Every prompt
-    │
-    ├─ Detect intent (scripts/detect_intent.py — no API, instant)
-    │       │
-    │    CODE? ──YES──► caveman-code
-    │       │           (terse + validation-first + spec-before-build)
-    │       │
-    │       NO ────────► caveman-chat
-    │                    (terse prose only)
-    │
-    ├─ Find best installed skill
-    │
-    └─ Execute skill in active caveman mode
-```
+![Detection flow](docs/detection-flow.svg)
 
 Code signals: file extensions, code blocks (```), error messages, stack traces, verbs like fix/debug/implement/refactor.
 Chat signals: "explain", "what is", "how does", "summarize", question phrases.
