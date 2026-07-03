@@ -1,8 +1,8 @@
 # auto-skill-finder
 
-**Universal AI skill router.** Send a prompt — the right skill loads automatically. No `/skill` commands. No manual selection. Works with Claude Code, Codex, Cursor, OpenCode, Gemini CLI, and any agent that reads `SKILL.md` or `AGENTS.md`.
+**Universal AI skill router with dual-mode caveman.** Send a prompt — right skill loads automatically, correct caveman mode activates. No `/skill` commands. No manual selection. Works with Claude Code, Codex, Cursor, OpenCode, Gemini CLI, and any agent that reads `SKILL.md` or `AGENTS.md`.
 
-Built-in caveman mode cuts response tokens by ~65–75% with zero accuracy loss.
+Cuts response tokens ~65–75%. Zero accuracy loss. Zero config.
 
 ---
 
@@ -10,13 +10,75 @@ Built-in caveman mode cuts response tokens by ~65–75% with zero accuracy loss.
 
 Every prompt you send:
 
-1. **Scans** all installed skills across all your AI agents
-2. **Scores** each skill against your prompt (name match, trigger keywords, description overlap)
-3. **Loads** the best match silently — no announcement, no friction
-4. **Compresses** skill content before injecting it (saves input tokens)
-5. **Responds** in caveman mode (~75% fewer output tokens)
+1. **Detects intent** — code or chat? (rule-based, no API, instant)
+2. **Activates mode** — caveman-code (validation-first engineering) or caveman-chat (terse prose)
+3. **Scans** all installed skills across all your AI agents
+4. **Scores** each skill against your prompt (name match, trigger keywords, description overlap)
+5. **Loads** the best match silently — no announcement, no friction
+6. **Compresses** skill content before injecting it (saves input tokens)
+7. **Responds** in the active caveman mode
 
 No configuration. No flags. Fires on every message.
+
+---
+
+## Dual-mode: caveman-code vs caveman-chat
+
+Auto-detects which mode to use based on your prompt. No manual switching needed.
+
+### caveman-code (auto-activates for code tasks)
+
+Terse prose + validation-first engineering discipline:
+
+```
+Prompt: "fix the auth bug in my middleware"
+
+→ Reads full error/stacktrace first, quotes exact failing line
+→ States plan before writing code (spec-before-build)
+→ Smallest correct change only — no scope creep
+→ Validates before done: compile → unit test → smoke check
+→ Fixes root cause, not symptoms
+```
+
+Triggers: fix, debug, implement, build, refactor, write code, error, bug, stacktrace, migration, API, endpoint, test, deploy…
+
+### caveman-chat (auto-activates for everything else)
+
+Terse prose only. No engineering overhead.
+
+```
+Prompt: "explain how JWT works"
+
+→ Drops articles, filler, pleasantries, hedging
+→ Fragments OK. Short synonyms.
+→ Full sentences when needed for clarity
+→ Intensity: lite / full (default) / ultra
+```
+
+Triggers: explain, what is, how does, summarize, compare, tell me, plan, strategy…
+
+### Detection logic
+
+```
+Every prompt
+    │
+    ├─ Detect intent (scripts/detect_intent.py — no API, instant)
+    │       │
+    │    CODE? ──YES──► caveman-code
+    │       │           (terse + validation-first + spec-before-build)
+    │       │
+    │       NO ────────► caveman-chat
+    │                    (terse prose only)
+    │
+    ├─ Find best installed skill
+    │
+    └─ Execute skill in active caveman mode
+```
+
+Code signals: file extensions, code blocks (```), error messages, stack traces, verbs like fix/debug/implement/refactor.
+Chat signals: "explain", "what is", "how does", "summarize", question phrases.
+
+Turn off: `stop caveman` or `normal mode`.
 
 ---
 
@@ -64,12 +126,6 @@ Supported values: `claude`, `cursor`, `gemini`, `opencode`, `codex`, `cline`.
 AUTO_SKILL_UPDATE=1 curl -fsSL https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.sh | bash
 ```
 
-### Custom install directory
-
-```bash
-AUTO_SKILL_DIR="$HOME/tools/auto-skill-finder" curl -fsSL ... | bash
-```
-
 ### Manual (any agent)
 
 Copy `SKILL.md` content into your agent's system prompt, rules file, or instructions. Copy `AGENTS.md` for agents that auto-discover it (OpenCode, Copilot).
@@ -78,31 +134,31 @@ Copy `SKILL.md` content into your agent's system prompt, rules file, or instruct
 
 ## No slash commands needed
 
-After install, **just talk normally.** The AI agent finds and loads the right skill by itself.
+After install, **just talk normally.** The AI agent finds and loads the right skill by itself — and picks the right caveman mode.
 
 ```
 ❌ Old way:  /github-pr review this diff
-✅ New way:  review my pull request
+✅ New way:  review my pull request          → caveman-code activates
 
 ❌ Old way:  /docker-compose generate postgres setup
-✅ New way:  set up postgres with docker
+✅ New way:  set up postgres with docker     → caveman-code activates
 
 ❌ Old way:  /stripe-integration add subscription billing
-✅ New way:  add stripe subscription to my app
+✅ New way:  add stripe subscription to my app  → caveman-code activates
 
 ❌ Old way:  /jest write unit tests for this function
-✅ New way:  write unit tests for this function
+✅ New way:  write unit tests for this function  → caveman-code activates
 
 ❌ Old way:  /sql-optimizer fix this slow query
-✅ New way:  this query is slow, fix it
+✅ New way:  this query is slow, fix it      → caveman-code activates
 
 ❌ Old way:  /linear create a bug ticket
-✅ New way:  create a bug ticket for this issue
+✅ New way:  create a bug ticket for this issue  → caveman-chat activates
 ```
 
 No `/commands`. No memorizing skill names. No manual invocation.
-The router scores every installed skill against your prompt and silently loads the winner.
-If no skill matches, the agent answers normally — no errors, no interruption.
+Router scores every installed skill against your prompt, picks the winner, activates the right mode — all silently.
+If no skill matches, agent answers normally — no errors, no interruption.
 
 ---
 
@@ -121,7 +177,7 @@ Thresholds:
 - **5–11** → load skill, one-line note
 - **< 4** → fallback to general AI behavior
 
-Skills are discovered from `~/.claude/skills/`, `~/.claude/plugins/`, `~/.cursor/skills/`, `~/.config/opencode/skills/`, `~/skills/`, and current directory.
+Skills discovered from: `~/.claude/skills/`, `~/.claude/plugins/`, `~/.cursor/skills/`, `~/.config/opencode/skills/`, `~/skills/`, current directory.
 
 ---
 
@@ -160,6 +216,7 @@ Requires `ANTHROPIC_API_KEY` or `claude` CLI in PATH.
 | Script | Purpose | API needed |
 |--------|---------|------------|
 | `scripts/skill_finder.py` | Core routing engine | No |
+| `scripts/detect_intent.py` | Code vs chat classifier (per-prompt) | No |
 | `scripts/inline_compress.py` | Rule-based prose compression (runs in hook) | No |
 | `scripts/prompt_analyzer.py` | Intent and entity extraction | No |
 | `scripts/build_index.py` | Build searchable skill index cache | No |
@@ -172,15 +229,22 @@ Requires `ANTHROPIC_API_KEY` or `claude` CLI in PATH.
 
 ## Caveman mode
 
-Always active. Drops articles, filler, pleasantries. Fragments OK. Technical terms exact. Code unchanged.
+Always active. Two modes, auto-selected per prompt.
 
+**caveman-chat** (explanations, Q&A, planning):
 ```
 Not: "Sure! I'd be happy to help you with that..."
-Yes: "Bug in auth middleware. Token expiry uses < not <=. Fix:"
+Yes: "JWT = signed token. Header.Payload.Signature. Server verify signature, no DB lookup needed."
 ```
 
-Turns off: say `stop caveman` or `normal mode`.
-Intensity levels: `lite`, `full` (default), `ultra`.
+**caveman-code** (code tasks):
+```
+Not: "You might want to consider adding error handling here potentially."
+Yes: "Missing error handling. Add try/catch. Test with invalid input:"
+```
+
+Turn off: `stop caveman` or `normal mode`.
+Intensity: `caveman lite`, `caveman ultra`.
 
 ---
 
@@ -214,11 +278,15 @@ auto-skill-finder/
 │   └── install.js        ← Multi-agent installer
 ├── hooks/
 │   ├── SessionStart.js       ← Caveman flag + system context
-│   └── UserPromptSubmit.js   ← Per-prompt routing + compression
+│   └── UserPromptSubmit.js   ← Per-prompt routing + mode detection
+├── skills/
+│   ├── caveman-code/SKILL.md ← Code mode: terse + validation-first
+│   └── caveman-chat/SKILL.md ← Chat mode: terse prose only
 ├── config/
 │   └── agent-paths.json  ← Agent-specific skill dir config
 └── scripts/
     ├── skill_finder.py       ← Core discovery engine
+    ├── detect_intent.py      ← Code vs chat classifier
     ├── inline_compress.py    ← Rule-based compressor (no API)
     ├── prompt_analyzer.py    ← Intent extraction
     ├── build_index.py        ← Skill index cache
