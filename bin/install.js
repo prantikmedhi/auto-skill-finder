@@ -45,14 +45,14 @@ const AGENTS = [
     label: "Gemini CLI",
     detect: () => fs.existsSync(path.join(HOME, ".gemini")) || fs.existsSync(path.join(XDG_CONFIG, "gemini")),
     install: installGemini,
-    uninstall: () => { /* extension manifest removal */ },
+    uninstall: uninstallGemini,
   },
   {
     id: "opencode",
     label: "OpenCode",
     detect: () => fs.existsSync(path.join(XDG_CONFIG, "opencode")),
     install: installOpenCode,
-    uninstall: () => { /* AGENTS.md removal */ },
+    uninstall: uninstallOpenCode,
   },
   {
     id: "codex",
@@ -60,7 +60,7 @@ const AGENTS = [
     soft: true,
     detect: () => fs.existsSync(path.join(HOME, ".codex")),
     install: installCodex,
-    uninstall: () => { /* config removal */ },
+    uninstall: uninstallCodex,
   },
   {
     id: "cline",
@@ -227,6 +227,37 @@ function installCodex() {
     fs.appendFileSync(sysPrompt, content, "utf8");
     console.log(`  Codex system-prompt → ${sysPrompt}`);
   }
+}
+
+function uninstallGemini() {
+  const extPath = path.join(XDG_CONFIG, "gemini", "extensions", "auto-skill-finder");
+  try {
+    fs.rmSync(extPath, { recursive: true, force: true });
+    console.log(`  Removed ${extPath}`);
+  } catch (_) {}
+}
+
+function uninstallOpenCode() {
+  const agentsMd = path.join(XDG_CONFIG, "opencode", "workspace", "AGENTS.md");
+  try { fs.unlinkSync(agentsMd); console.log(`  Removed ${agentsMd}`); } catch (_) {}
+}
+
+function uninstallCodex() {
+  const sysPrompt = path.join(HOME, ".codex", "system-prompt.md");
+  try {
+    const content = fs.readFileSync(sysPrompt, "utf8");
+    // Remove the block we appended (from \n\n---\nname: auto-skill-finder onwards)
+    const cleaned = content
+      .replace(/\n{1,2}---\nname: auto-skill-finder[\s\S]*$/m, "")
+      .replace(/\n{1,2}# Auto Skill Finder[\s\S]*$/m, "")
+      .trimEnd();
+    if (cleaned !== content.trimEnd()) {
+      fs.writeFileSync(sysPrompt, cleaned + "\n", "utf8");
+      console.log(`  Cleaned ${sysPrompt}`);
+    } else {
+      console.log(`  Codex: no auto-skill-finder block found in ${sysPrompt}`);
+    }
+  } catch (_) {}
 }
 
 function readFile(p) {
