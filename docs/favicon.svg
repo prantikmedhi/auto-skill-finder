@@ -1,0 +1,10 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="7" fill="#111827"/>
+  <!-- Routing icon: single line splits into two paths -->
+  <line x1="16" y1="8" x2="16" y2="16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16,16 L10,24" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16,16 L22,24" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="16" cy="8" r="2" fill="#fff"/>
+  <circle cx="10" cy="24" r="2" fill="#fff"/>
+  <circle cx="22" cy="24" r="2" fill="#fff"/>
+</svg>

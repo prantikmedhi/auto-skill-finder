@@ -1,0 +1,75 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#ffffff"/>
+
+  <!-- Subtle grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f3f4f6" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1200" height="4" fill="#111827"/>
+
+  <!-- Favicon / Logo mark (top-left) -->
+  <rect x="60" y="52" width="36" height="36" rx="8" fill="#111827"/>
+  <line x1="78" y1="61" x2="78" y2="72" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M78,72 L70,82" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M78,72 L86,82" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="78" cy="61" r="2.5" fill="#fff"/>
+  <circle cx="70" cy="82" r="2.5" fill="#fff"/>
+  <circle cx="86" cy="82" r="2.5" fill="#fff"/>
+
+  <!-- Brand name -->
+  <text x="108" y="77" font-size="18" font-weight="600" fill="#111827" class="mono">auto-skill-finder</text>
+
+  <!-- Main headline -->
+  <text x="60" y="240" font-size="72" font-weight="700" fill="#111827" letter-spacing="-2">The right skill loads</text>
+  <text x="60" y="326" font-size="72" font-weight="700" fill="#111827" letter-spacing="-2">automatically.</text>
+
+  <!-- Subtext -->
+  <text x="60" y="390" font-size="24" fill="#6b7280">Zero slash commands · ~75% fewer tokens · 7 AI agents supported</text>
+
+  <!-- Stat pills -->
+  <rect x="60" y="432" width="150" height="48" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="135" y="452" text-anchor="middle" font-size="13" font-weight="600" fill="#6b7280">CONTEXT SAVED</text>
+  <text x="135" y="472" text-anchor="middle" font-size="20" font-weight="700" fill="#111827">95%</text>
+
+  <rect x="228" y="432" width="150" height="48" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="303" y="452" text-anchor="middle" font-size="13" font-weight="600" fill="#6b7280">FEWER TOKENS</text>
+  <text x="303" y="472" text-anchor="middle" font-size="20" font-weight="700" fill="#111827">75%</text>
+
+  <rect x="396" y="432" width="150" height="48" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="471" y="452" text-anchor="middle" font-size="13" font-weight="600" fill="#6b7280">AGENTS</text>
+  <text x="471" y="472" text-anchor="middle" font-size="20" font-weight="700" fill="#111827">7</text>
+
+  <!-- Terminal window (right side) -->
+  <rect x="660" y="150" width="480" height="290" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+  <!-- term bar -->
+  <rect x="660" y="150" width="480" height="44" rx="10" fill="#f9fafb"/>
+  <rect x="660" y="172" width="480" height="22" fill="#f9fafb"/>
+  <circle cx="687" cy="172" r="6" fill="#d1d5db"/>
+  <circle cx="707" cy="172" r="6" fill="#d1d5db"/>
+  <circle cx="727" cy="172" r="6" fill="#d1d5db"/>
+  <text x="755" y="177" font-size="13" fill="#9ca3af" class="mono">UserPromptSubmit hook</text>
+  <rect x="660" y="193" width="480" height="1" fill="#e5e7eb"/>
+  <!-- term content -->
+  <text x="680" y="228" font-size="14" fill="#9ca3af" class="mono">$ fix the auth bug in middleware</text>
+  <text x="680" y="258" font-size="14" fill="#9ca3af" class="mono">  running auto-skill-finder...</text>
+  <text x="680" y="288" font-size="14" fill="#9ca3af" class="mono">  › intent: <tspan fill="#111827" font-weight="600">code</tspan></text>
+  <text x="680" y="318" font-size="14" fill="#9ca3af" class="mono">  › mode: <tspan fill="#111827" font-weight="600">caveman-code</tspan></text>
+  <text x="680" y="348" font-size="14" fill="#111827" font-weight="600" class="mono">  › skill loaded (score: 11)</text>
+  <text x="680" y="378" font-size="14" fill="#9ca3af" class="mono">  done. context injected. ▋</text>
+
+  <!-- URL / github -->
+  <text x="60" y="580" font-size="18" fill="#9ca3af" class="mono">github.com/prantikmedhi/auto-skill-finder</text>
+</svg>
