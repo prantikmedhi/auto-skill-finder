@@ -1,0 +1,49 @@
+{
+  "name": "auto-skill-finder",
+  "display_name": "Auto Skill Finder",
+  "description": "Universal AI skill router with dual-mode caveman. Auto-routes any prompt to the best installed skill. Zero slash commands. ~75% fewer tokens. Works with Claude Code, Codex, Cursor, Gemini CLI, OpenCode.",
+  "version": "2.1.0",
+  "author": "prantikmedhi",
+  "repository": "https://github.com/prantikmedhi/auto-skill-finder",
+  "homepage": "https://prantikmedhi.github.io/auto-skill-finder/",
+  "license": "MIT",
+  "type": "plugin",
+  "tags": ["skill-router", "caveman", "token-reduction", "productivity", "automation"],
+  "skills": [
+    {
+      "name": "auto-skill-finder",
+      "path": "SKILL.md",
+      "description": "Universal AI skill router with dual-mode caveman (code vs chat)"
+    },
+    {
+      "name": "caveman-code",
+      "path": "skills/caveman-code/SKILL.md",
+      "description": "Caveman mode for code tasks — terse prose + validation-first engineering"
+    },
+    {
+      "name": "caveman-chat",
+      "path": "skills/caveman-chat/SKILL.md",
+      "description": "Caveman mode for chat — terse prose only, no engineering overhead"
+    }
+  ],
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "path": "hooks/SessionStart.js",
+      "description": "Writes caveman-active flag and injects caveman rules as system context"
+    },
+    {
+      "event": "UserPromptSubmit",
+      "path": "hooks/UserPromptSubmit.js",
+      "description": "Per-prompt: detects intent, routes to best skill, compresses and injects context"
+    }
+  ],
+  "scripts": {
+    "install": "node bin/install.js",
+    "uninstall": "node bin/install.js --uninstall"
+  },
+  "requirements": {
+    "node": ">=18",
+    "python": ">=3.10"
+  }
+}
