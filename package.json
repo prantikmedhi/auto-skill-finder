@@ -1,0 +1,23 @@
+{
+  "name": "auto-skill-finder",
+  "version": "2.0.0",
+  "description": "Universal auto skill router with caveman mode integration for Claude, Codex, Cursor, OpenCode, Gemini CLI",
+  "type": "commonjs",
+  "bin": {
+    "auto-skill": "./bin/install.js"
+  },
+  "scripts": {
+    "install-hooks": "node bin/install.js",
+    "uninstall-hooks": "node bin/install.js --uninstall",
+    "list-agents": "node bin/install.js --list",
+    "build-index": "python3 scripts/build_index.py",
+    "find-skill": "python3 scripts/skill_finder.py"
+  },
+  "keywords": [
+    "claude", "codex", "cursor", "gemini", "opencode", "skill", "routing",
+    "caveman", "ai-agent", "auto-skill"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

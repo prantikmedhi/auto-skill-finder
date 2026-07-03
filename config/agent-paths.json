@@ -1,0 +1,68 @@
+{
+  "_comment": "Agent-specific skill directory paths. ~ expands to home dir. {CONFIG} expands to XDG_CONFIG_HOME or ~/.config.",
+  "agents": {
+    "claude": {
+      "label": "Claude Code",
+      "skill_dirs": [
+        "~/.claude/skills",
+        "~/.claude/plugins"
+      ],
+      "hook_dir": "~/.claude/hooks",
+      "settings_file": "~/.claude/settings.json",
+      "auto_discover_files": ["SKILL.md"],
+      "hook_events": ["SessionStart", "UserPromptSubmit"]
+    },
+    "cursor": {
+      "label": "Cursor",
+      "skill_dirs": [
+        "~/.cursor/skills"
+      ],
+      "rule_dirs": [
+        ".cursor/rules"
+      ],
+      "auto_discover_files": ["*.mdc", "*.md"]
+    },
+    "gemini": {
+      "label": "Gemini CLI",
+      "skill_dirs": [
+        "~/.gemini/skills",
+        "{CONFIG}/gemini/skills"
+      ],
+      "extension_file": "gemini-extension.json",
+      "auto_discover_files": ["GEMINI.md", "SKILL.md"]
+    },
+    "opencode": {
+      "label": "OpenCode",
+      "skill_dirs": [
+        "{CONFIG}/opencode/skills"
+      ],
+      "auto_discover_files": ["AGENTS.md", "SKILL.md"]
+    },
+    "codex": {
+      "label": "OpenAI Codex",
+      "skill_dirs": [
+        "~/.codex/skills"
+      ],
+      "config_file": "~/.codex/config.toml",
+      "auto_discover_files": ["SKILL.md"]
+    },
+    "copilot": {
+      "label": "GitHub Copilot",
+      "auto_discover_files": ["AGENTS.md", ".github/copilot-instructions.md"]
+    },
+    "cline": {
+      "label": "Cline",
+      "rule_dirs": [".clinerules"],
+      "auto_discover_files": ["*.md"]
+    },
+    "windsurf": {
+      "label": "Windsurf",
+      "rule_dirs": [".windsurf/rules"],
+      "auto_discover_files": ["*.md"]
+    }
+  },
+  "universal_fallback_dirs": [
+    "~/skills",
+    "./skills"
+  ]
+}

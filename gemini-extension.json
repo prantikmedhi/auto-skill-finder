@@ -1,0 +1,6 @@
+{
+  "name": "auto-skill-finder",
+  "version": "2.0.0",
+  "description": "Auto-routes prompts to best installed skill and activates caveman mode. Zero manual invocation.",
+  "contextFileName": "GEMINI.md"
+}
