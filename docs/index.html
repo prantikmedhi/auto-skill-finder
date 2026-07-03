@@ -46,8 +46,19 @@ nav {
 }
 .nav-brand { font-weight: 600; font-size: 15px; }
 .nav-links { display: flex; gap: 2rem; }
-.nav-links a { font-size: 14px; color: var(--text-muted); transition: color 0.2s; }
+.nav-links a {
+  font-size: 14px; color: var(--text-muted);
+  position: relative; padding-bottom: 2px;
+  transition: color 0.2s;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+  height: 1px; background: var(--text-main);
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .nav-links a:hover { color: var(--text-main); }
+.nav-links a:hover::after { transform: scaleX(1); }
 .nav-gh {
   font-size: 13px; font-weight: 500;
   padding: 6px 14px;
@@ -59,8 +70,8 @@ nav {
 
 /* Layout */
 section { padding: 100px 0; }
-.container { max-width: 1040px; margin: 0 auto; padding: 0 2rem; }
-.divider { height: 1px; background: var(--border); margin: 0 2rem; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
+.divider { height: 1px; background: var(--border); margin: 0 3rem; }
 .section-tint { background: var(--bg-subtle); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 
 /* Typography */
