@@ -76,6 +76,27 @@ Copy `SKILL.md` content into your agent's system prompt, rules file, or instruct
 
 ---
 
+## No slash commands needed
+
+After install, **just talk normally.** The AI agent finds and loads the right skill by itself.
+
+```
+❌ Old way:  /seo audit https://example.com
+✅ New way:  analyze SEO for my site
+
+❌ Old way:  /caveman-commit
+✅ New way:  write a commit message for my changes
+
+❌ Old way:  /obsidian-markdown
+✅ New way:  create an obsidian note with wikilinks
+```
+
+No `/commands`. No memorizing skill names. No manual invocation.
+The router scores every installed skill against your prompt and silently loads the winner.
+If no skill matches, the agent answers normally — no errors, no interruption.
+
+---
+
 ## How skill routing works
 
 Scoring (max 22 points per skill):
