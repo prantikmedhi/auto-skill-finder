@@ -207,4 +207,4 @@ if (selectedSkillContent && selectedSkillName) {
   parts.push(`[AUTO-SKILL: ${selectedSkillName}]\n${body}`);
 }
 
-process.stdout.write(JSON.stringify({ hookSpecificOutput: parts.join("\n\n") }));
+process.stdout.write(parts.join("\n\n"));
