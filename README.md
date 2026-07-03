@@ -32,25 +32,43 @@ No configuration. No flags. Fires on every message.
 
 ## Install
 
-### Claude Code (recommended)
+### One-liner (recommended)
 
+**macOS / Linux / WSL / Git Bash:**
 ```bash
-git clone https://github.com/prantikmedhi/auto-skill-finder.git
-cd auto-skill-finder
-node bin/install.js
+curl -fsSL https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.sh | bash
 ```
 
-Hooks auto-wire into `~/.claude/settings.json`. Takes effect next session.
-
-### All agents (auto-detect)
-
-```bash
-node bin/install.js          # installs for every detected agent
-node bin/install.js --list   # see which agents were found
-node bin/install.js --only cursor   # one agent only
+**Windows (PowerShell 5.1+):**
+```powershell
+irm https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.ps1 | iex
 ```
 
-Supports: Claude Code, Cursor, Gemini CLI, OpenCode, Codex, Cline.
+Clones to `~/.auto-skill-finder`, auto-detects installed agents, wires hooks. Takes effect next session.
+
+### Install for one agent only
+
+```bash
+# bash
+AUTO_SKILL_ONLY=claude curl -fsSL https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.sh | bash
+
+# PowerShell
+$env:AUTO_SKILL_ONLY="claude"; irm https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.ps1 | iex
+```
+
+Supported values: `claude`, `cursor`, `gemini`, `opencode`, `codex`, `cline`.
+
+### Update existing install
+
+```bash
+AUTO_SKILL_UPDATE=1 curl -fsSL https://raw.githubusercontent.com/prantikmedhi/auto-skill-finder/main/install.sh | bash
+```
+
+### Custom install directory
+
+```bash
+AUTO_SKILL_DIR="$HOME/tools/auto-skill-finder" curl -fsSL ... | bash
+```
 
 ### Manual (any agent)
 
