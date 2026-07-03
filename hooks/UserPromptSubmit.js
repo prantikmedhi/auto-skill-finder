@@ -17,11 +17,33 @@ const { spawnSync } = require("child_process");
 
 const CLAUDE_CONFIG_DIR = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), ".claude");
 const HOME = os.homedir();
-const SCRIPTS = path.join(__dirname, "..", "scripts");
+
+// Find the auto-skill-finder install directory (hook may be installed to ~/.claude/hooks/)
+function findInstallDir() {
+  const candidates = [
+    path.join(__dirname, ".."),                          // dev: hooks/../
+    path.join(HOME, ".auto-skill-finder"),               // one-liner install
+    path.join(HOME, "skills", "auto-skill-finder"),      // ~/skills/ location
+    path.join(HOME, ".claude", "skills", "auto-skill-finder"),
+  ];
+  if (process.env.AUTO_SKILL_DIR) candidates.unshift(process.env.AUTO_SKILL_DIR);
+  // Prefer dir that has detect_intent.py (newest feature marker)
+  for (const dir of candidates) {
+    if (fs.existsSync(path.join(dir, "scripts", "detect_intent.py"))) return dir;
+  }
+  // Fallback: any dir with skill_finder.py
+  for (const dir of candidates) {
+    if (fs.existsSync(path.join(dir, "scripts", "skill_finder.py"))) return dir;
+  }
+  return candidates[0];
+}
+
+const INSTALL_DIR = findInstallDir();
+const SCRIPTS = path.join(INSTALL_DIR, "scripts");
 const SKILL_FINDER    = path.join(SCRIPTS, "skill_finder.py");
 const DETECT_INTENT   = path.join(SCRIPTS, "detect_intent.py");
 const INLINE_COMPRESS = path.join(SCRIPTS, "inline_compress.py");
-const SKILLS_DIR      = path.join(__dirname, "..", "skills");
+const SKILLS_DIR      = path.join(INSTALL_DIR, "skills");
 
 // ── Read prompt from stdin ─────────────────────────────────────────────────────
 
@@ -108,7 +130,15 @@ function runPythonFinder(prompt) {
   if (!py || !fs.existsSync(SKILL_FINDER)) return null;
   try {
     const r = spawnSync(py, [SKILL_FINDER, "--prompt", prompt, "--json"], { timeout: 5000, encoding: "utf8" });
-    if (r.status === 0 && r.stdout) return JSON.parse(r.stdout);
+    if (r.status !== 0 || !r.stdout) return null;
+    const data = JSON.parse(r.stdout);
+    const top = data.candidate_skills && data.candidate_skills[0];
+    if (!top || top.score < 4) return null;
+    return {
+      selected_skill: top.skill_name,
+      selected_skill_path: top.path,
+      score: top.score,
+    };
   } catch (_) {}
   return null;
 }
@@ -173,38 +203,68 @@ function compressContent(content) {
   return content;
 }
 
+// ── Status log (stderr → visible in hook UI, not injected into AI) ─────────────
+
+function status(step, detail = "") {
+  const line = detail ? `  ${step}: ${detail}` : `  ${step}`;
+  process.stderr.write(line + "\n");
+}
+
 // ── Assemble output ────────────────────────────────────────────────────────────
+
+process.stderr.write("⚡ auto-skill-finder\n");
 
 const parts = [];
 
 // 1. Caveman anchor (mode-specific)
+status("intent", intent);
+status("mode", `caveman-${intent}`);
 parts.push(intent === "code" ? CAVEMAN_CODE_ANCHOR : CAVEMAN_CHAT_ANCHOR);
 
 // 2. Mode skill body (caveman-code or caveman-chat rules)
 const modeSkillBody = loadModeSkill(intent);
 if (modeSkillBody) {
-  parts.push(`[MODE: caveman-${intent}]\n${compressContent(modeSkillBody)}`);
+  const compressed = compressContent(modeSkillBody);
+  const saved = modeSkillBody.length - compressed.length;
+  status("rules", `caveman-${intent} loaded (${saved > 0 ? `-${saved}ch` : "no change"})`);
+  parts.push(`[MODE: caveman-${intent}]\n${compressed}`);
+} else {
+  status("rules", `caveman-${intent} (built-in anchor only)`);
 }
 
 // 3. Best matching installed skill
 let selectedSkillContent = "";
 let selectedSkillName = "";
+let selectedSkillScore = 0;
 
+status("scanning", "installed skills…");
 const finderResult = runPythonFinder(prompt);
 if (finderResult && finderResult.selected_skill_path) {
   try {
     selectedSkillContent = fs.readFileSync(finderResult.selected_skill_path, "utf8");
     selectedSkillName = finderResult.selected_skill || "";
+    selectedSkillScore = finderResult.score || 0;
   } catch (_) {}
 } else {
   const match = scanSkillsInline(prompt);
-  if (match) { selectedSkillContent = match.content; selectedSkillName = match.name; }
+  if (match) {
+    selectedSkillContent = match.content;
+    selectedSkillName = match.name;
+    selectedSkillScore = match.score;
+  }
 }
 
 if (selectedSkillContent && selectedSkillName) {
   const rawBody = selectedSkillContent.replace(/^---[\s\S]*?---\n?/, "").trim();
+  const before = rawBody.length;
   const body = compressContent(rawBody);
+  const pct = Math.round((1 - body.length / before) * 100);
+  status("skill", `${selectedSkillName} (score:${selectedSkillScore}) → compressed ${pct}%`);
   parts.push(`[AUTO-SKILL: ${selectedSkillName}]\n${body}`);
+} else {
+  status("skill", "no match — general caveman mode");
 }
+
+status("done", `${parts.length} context blocks injected`);
 
 process.stdout.write(parts.join("\n\n"));
