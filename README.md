@@ -81,14 +81,23 @@ Copy `SKILL.md` content into your agent's system prompt, rules file, or instruct
 After install, **just talk normally.** The AI agent finds and loads the right skill by itself.
 
 ```
-❌ Old way:  /seo audit https://example.com
-✅ New way:  analyze SEO for my site
+❌ Old way:  /github-pr review this diff
+✅ New way:  review my pull request
 
-❌ Old way:  /caveman-commit
-✅ New way:  write a commit message for my changes
+❌ Old way:  /docker-compose generate postgres setup
+✅ New way:  set up postgres with docker
 
-❌ Old way:  /obsidian-markdown
-✅ New way:  create an obsidian note with wikilinks
+❌ Old way:  /stripe-integration add subscription billing
+✅ New way:  add stripe subscription to my app
+
+❌ Old way:  /jest write unit tests for this function
+✅ New way:  write unit tests for this function
+
+❌ Old way:  /sql-optimizer fix this slow query
+✅ New way:  this query is slow, fix it
+
+❌ Old way:  /linear create a bug ticket
+✅ New way:  create a bug ticket for this issue
 ```
 
 No `/commands`. No memorizing skill names. No manual invocation.
