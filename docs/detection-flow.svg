@@ -53,10 +53,10 @@
 
   <!-- caveman-code box (right) -->
   <rect x="455" y="306" width="180" height="86" rx="6" class="accent-box"/>
-  <text x="545" y="328" text-anchor="middle" class="label-md" fill="#c0441e">caveman-code</text>
-  <text x="545" y="348" text-anchor="middle" class="note" fill="#e8634a">terse prose +</text>
-  <text x="545" y="362" text-anchor="middle" class="note" fill="#e8634a">validation-first</text>
-  <text x="545" y="376" text-anchor="middle" class="note" fill="#e8634a">spec-before-build</text>
+  <text x="545" y="328" text-anchor="middle" class="label-md" fill="#c0441e">ponytail-code</text>
+  <text x="545" y="348" text-anchor="middle" class="note" fill="#e8634a">lazy senior dev</text>
+  <text x="545" y="362" text-anchor="middle" class="note" fill="#e8634a">YAGNI ladder</text>
+  <text x="545" y="376" text-anchor="middle" class="note" fill="#e8634a">shortest diff</text>
 
   <!-- caveman-chat box (left) -->
   <rect x="46" y="306" width="180" height="86" rx="6" class="box"/>

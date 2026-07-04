@@ -1,24 +1,24 @@
 {
   "name": "auto-skill-finder",
   "display_name": "Auto Skill Finder",
-  "description": "Universal AI skill router with dual-mode caveman. Auto-routes any prompt to the best installed skill. Zero slash commands. ~75% fewer tokens. Works with Claude Code, Codex, Cursor, Gemini CLI, OpenCode.",
-  "version": "2.1.0",
+  "description": "Universal AI skill router with dual-mode discipline: ponytail for code, caveman for chat. Auto-routes any prompt to the best installed skill. Zero slash commands. ~75% fewer tokens. Works with Claude Code, Codex, Cursor, Gemini CLI, OpenCode.",
+  "version": "2.2.0",
   "author": "prantikmedhi",
   "repository": "https://github.com/prantikmedhi/auto-skill-finder",
   "homepage": "https://prantikmedhi.github.io/auto-skill-finder/",
   "license": "MIT",
   "type": "plugin",
-  "tags": ["skill-router", "caveman", "token-reduction", "productivity", "automation"],
+  "tags": ["skill-router", "ponytail", "caveman", "token-reduction", "productivity", "automation"],
   "skills": [
     {
       "name": "auto-skill-finder",
       "path": "SKILL.md",
-      "description": "Universal AI skill router with dual-mode caveman (code vs chat)"
+      "description": "Universal AI skill router with dual-mode discipline (ponytail code vs caveman chat)"
     },
     {
-      "name": "caveman-code",
-      "path": "skills/caveman-code/SKILL.md",
-      "description": "Caveman mode for code tasks — terse prose + validation-first engineering"
+      "name": "ponytail-code",
+      "path": "skills/ponytail-code/SKILL.md",
+      "description": "Ponytail mode for code tasks — lazy senior dev, YAGNI ladder, shortest diff"
     },
     {
       "name": "caveman-chat",

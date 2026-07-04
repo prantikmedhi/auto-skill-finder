@@ -1,6 +1,6 @@
 # auto-skill-finder
 
-**Universal AI skill router with dual-mode caveman.** Send a prompt — right skill loads automatically, correct caveman mode activates. No `/skill` commands. No manual selection. Works with Claude Code, Codex, Cursor, OpenCode, Gemini CLI, and any agent that reads `SKILL.md` or `AGENTS.md`.
+**Universal AI skill router with dual-mode discipline.** Send a prompt — right skill loads automatically, correct mode activates: **ponytail** for code (lazy senior dev, YAGNI), **caveman** for chat (terse prose). No `/skill` commands. No manual selection. Works with Claude Code, Codex, Cursor, OpenCode, Gemini CLI, and any agent that reads `SKILL.md` or `AGENTS.md`.
 
 Cuts response tokens ~65–75%. Zero accuracy loss. Zero config.
 
@@ -11,33 +11,33 @@ Cuts response tokens ~65–75%. Zero accuracy loss. Zero config.
 Every prompt you send:
 
 1. **Detects intent** — code or chat? (rule-based, no API, instant)
-2. **Activates mode** — caveman-code (validation-first engineering) or caveman-chat (terse prose)
+2. **Activates mode** — ponytail-code (lazy senior dev, YAGNI) or caveman-chat (terse prose)
 3. **Scans** all installed skills across all your AI agents
 4. **Scores** each skill against your prompt (name match, trigger keywords, description overlap)
 5. **Loads** the best match silently — no announcement, no friction
 6. **Compresses** skill content before injecting it (saves input tokens)
-7. **Responds** in the active caveman mode
+7. **Responds** in the active mode
 
 No configuration. No flags. Fires on every message.
 
 ---
 
-## Dual-mode: caveman-code vs caveman-chat
+## Dual-mode: ponytail-code vs caveman-chat
 
 Auto-detects which mode to use based on your prompt. No manual switching needed.
 
-### caveman-code (auto-activates for code tasks)
+### ponytail-code (auto-activates for code tasks)
 
-Terse prose + validation-first engineering discipline:
+Lazy senior developer discipline — [ponytail](https://github.com/DietrichGebert/ponytail). The best code is the code never written:
 
 ```
 Prompt: "fix the auth bug in my middleware"
 
-→ Reads full error/stacktrace first, quotes exact failing line
-→ States plan before writing code (spec-before-build)
-→ Smallest correct change only — no scope creep
-→ Validates before done: compile → unit test → smoke check
-→ Fixes root cause, not symptoms
+→ Climbs the YAGNI ladder: reuse codebase → stdlib → native platform → installed dep → one line
+→ Fixes root cause, not symptom — one guard in the shared function, not one per caller
+→ Shortest working diff — after understanding the problem fully
+→ No unrequested abstractions, no scaffolding "for later"
+→ Output: code first, then max 3 lines (what skipped, when to add)
 ```
 
 Triggers: fix, debug, implement, build, refactor, write code, error, bug, stacktrace, migration, API, endpoint, test, deploy…
@@ -64,7 +64,7 @@ Triggers: explain, what is, how does, summarize, compare, tell me, plan, strateg
 Code signals: file extensions, code blocks (```), error messages, stack traces, verbs like fix/debug/implement/refactor.
 Chat signals: "explain", "what is", "how does", "summarize", question phrases.
 
-Turn off: `stop caveman` or `normal mode`.
+Turn off: `stop ponytail` / `stop caveman` or `normal mode`.
 
 ---
 
@@ -120,23 +120,23 @@ Copy `SKILL.md` content into your agent's system prompt, rules file, or instruct
 
 ## No slash commands needed
 
-After install, **just talk normally.** The AI agent finds and loads the right skill by itself — and picks the right caveman mode.
+After install, **just talk normally.** The AI agent finds and loads the right skill by itself — and picks the right mode.
 
 ```
 ❌ Old way:  /github-pr review this diff
-✅ New way:  review my pull request          → caveman-code activates
+✅ New way:  review my pull request          → ponytail-code activates
 
 ❌ Old way:  /docker-compose generate postgres setup
-✅ New way:  set up postgres with docker     → caveman-code activates
+✅ New way:  set up postgres with docker     → ponytail-code activates
 
 ❌ Old way:  /stripe-integration add subscription billing
-✅ New way:  add stripe subscription to my app  → caveman-code activates
+✅ New way:  add stripe subscription to my app  → ponytail-code activates
 
 ❌ Old way:  /jest write unit tests for this function
-✅ New way:  write unit tests for this function  → caveman-code activates
+✅ New way:  write unit tests for this function  → ponytail-code activates
 
 ❌ Old way:  /sql-optimizer fix this slow query
-✅ New way:  this query is slow, fix it      → caveman-code activates
+✅ New way:  this query is slow, fix it      → ponytail-code activates
 
 ❌ Old way:  /linear create a bug ticket
 ✅ New way:  create a bug ticket for this issue  → caveman-chat activates
@@ -213,7 +213,7 @@ Requires `ANTHROPIC_API_KEY` or `claude` CLI in PATH.
 
 ---
 
-## Caveman mode
+## Modes
 
 Always active. Two modes, auto-selected per prompt.
 
@@ -223,14 +223,15 @@ Not: "Sure! I'd be happy to help you with that..."
 Yes: "JWT = signed token. Header.Payload.Signature. Server verify signature, no DB lookup needed."
 ```
 
-**caveman-code** (code tasks):
+**ponytail-code** (code tasks):
 ```
-Not: "You might want to consider adding error handling here potentially."
-Yes: "Missing error handling. Add try/catch. Test with invalid input:"
+Not: writes a cache class with factory, interface, and config file
+Yes: "@lru_cache(maxsize=1000) on the fetch function. Skipped custom
+     cache class, add when lru_cache measurably falls short."
 ```
 
-Turn off: `stop caveman` or `normal mode`.
-Intensity: `caveman lite`, `caveman ultra`.
+Turn off: `stop ponytail` / `stop caveman` or `normal mode`.
+Intensity (chat): `caveman lite`, `caveman ultra`.
 
 ---
 
@@ -266,8 +267,8 @@ auto-skill-finder/
 │   ├── SessionStart.js       ← Caveman flag + system context
 │   └── UserPromptSubmit.js   ← Per-prompt routing + mode detection
 ├── skills/
-│   ├── caveman-code/SKILL.md ← Code mode: terse + validation-first
-│   └── caveman-chat/SKILL.md ← Chat mode: terse prose only
+│   ├── ponytail-code/SKILL.md ← Code mode: lazy senior dev, YAGNI ladder
+│   └── caveman-chat/SKILL.md  ← Chat mode: terse prose only
 ├── config/
 │   └── agent-paths.json  ← Agent-specific skill dir config
 └── scripts/
