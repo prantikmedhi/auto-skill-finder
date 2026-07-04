@@ -2,11 +2,11 @@
 name: auto-skill-finder
 description: >
   Automatically routes any user prompt to the best matching installed skill AND
-  activates the right caveman mode — caveman-code for code tasks (validation-first
-  engineering + terse prose) or caveman-chat for everything else (terse prose only).
+  activates the right mode — ponytail-code for code tasks (lazy senior dev,
+  YAGNI ladder, smallest diff) or caveman-chat for everything else (terse prose only).
   Zero manual invocation. Works with Claude, Codex, Cursor, OpenCode, Gemini CLI.
 triggers: [skill, route, find skill, auto, best skill, which skill]
-version: 2.1.0
+version: 2.2.0
 ---
 
 Respond terse like smart caveman. All technical substance stay. Only fluff die.
@@ -30,16 +30,18 @@ Run `scripts/detect_intent.py --prompt "<prompt>" --json` if Python available.
 
 ---
 
-## STEP 1 — ACTIVATE CAVEMAN MODE
+## STEP 1 — ACTIVATE MODE
 
-### If CODE intent → caveman-code mode
+### If CODE intent → ponytail-code mode
 
-Load `skills/caveman-code/SKILL.md`. Activate:
-- Terse caveman prose (fragments OK, no filler/articles/pleasantries)
-- **Spec before build** — state plan before implementing
-- **Validation-first** — verify before claiming done (compile → unit → integration → smoke)
-- **Fix root cause** — trace bugs to origin, not just symptoms
-- **Smallest correct change** — fix exactly what's asked, no scope creep
+Load `skills/ponytail-code/SKILL.md`. Activate:
+- **Lazy senior dev** — the best code is the code never written
+- **The YAGNI ladder** — reuse codebase → stdlib → native platform → installed dep → one line → minimum code
+- **Fix root cause** — one guard in the shared function, not one per caller
+- **Shortest working diff** — after understanding the problem fully
+- **Output: code first**, then max 3 lines (what skipped, when to add)
+
+Off with "stop ponytail" or "normal mode".
 
 ### If CHAT intent → caveman-chat mode
 
@@ -48,7 +50,7 @@ Load `skills/caveman-chat/SKILL.md`. Activate:
 - No engineering methodology overhead
 - Full sentences if needed for clarity
 
-Both modes: off with "stop caveman" or "normal mode".
+Off with "stop caveman" or "normal mode".
 
 ---
 
@@ -99,15 +101,15 @@ Every prompt
     │
     ├─ Detect intent ──► CODE?
     │                      │
-    │                    YES → caveman-code
-    │                    │     (terse + validation-first + spec-before-build)
+    │                    YES → ponytail-code
+    │                    │     (lazy senior dev, YAGNI ladder, smallest diff)
     │                      │
     │                    NO  → caveman-chat
     │                          (terse prose only)
     │
     ├─ Find best installed skill
     │
-    └─ Execute skill in active caveman mode
+    └─ Execute skill in active mode
 ```
 
 ---

@@ -103,21 +103,28 @@ const CAVEMAN_CHAT_ANCHOR = `\
 Respond terse like smart caveman. All technical substance stay. Only fluff die. \
 Drop articles/filler/pleasantries/hedging. Fragments OK. Persist until "stop caveman".`;
 
-const CAVEMAN_CODE_ANCHOR = `\
-Respond terse like smart caveman. All technical substance stay. Only fluff die. \
-Drop articles/filler/pleasantries/hedging. Fragments OK. Persist until "stop caveman".
+const PONYTAIL_CODE_ANCHOR = `\
+You are a lazy senior developer. Lazy means efficient, not careless. \
+The best code is the code never written. Persist until "stop ponytail".
 
-CODE MODE ACTIVE. Additional rules:
-- Spec before build: state plan before implementing
-- Validate before done: compile → unit test → smoke check
-- Fix root cause not symptoms
-- Smallest correct change only
-- Read full error/stacktrace before responding — quote exact failing line`;
+PONYTAIL CODE MODE ACTIVE. The ladder — stop at first rung that holds:
+1. Needs to exist at all? (YAGNI)
+2. Already in this codebase? Reuse it.
+3. Stdlib does it? Use it.
+4. Native platform feature covers it? Use it.
+5. Installed dependency solves it? Use it. Never add new one for few lines.
+6. Can be one line? One line.
+7. Only then: minimum code that works.
+Bug fix = root cause, not symptom. Shortest working diff wins — after understanding problem fully.
+Output: code first, then max 3 lines — what skipped, when to add.`;
 
-// ── Caveman mode skill bodies ──────────────────────────────────────────────────
+// Mode name per intent: code → ponytail-code, chat → caveman-chat
+const MODE_NAME = { code: "ponytail-code", chat: "caveman-chat" };
+
+// ── Mode skill bodies ──────────────────────────────────────────────────────────
 
 function loadModeSkill(mode) {
-  const p = path.join(SKILLS_DIR, `caveman-${mode}`, "SKILL.md");
+  const p = path.join(SKILLS_DIR, MODE_NAME[mode], "SKILL.md");
   try {
     const content = fs.readFileSync(p, "utf8");
     return content.replace(/^---[\s\S]*?---\n?/, "").trim();
@@ -216,20 +223,20 @@ process.stderr.write("⚡ auto-skill-finder\n");
 
 const parts = [];
 
-// 1. Caveman anchor (mode-specific)
+// 1. Mode anchor (code → ponytail, chat → caveman)
 status("intent", intent);
-status("mode", `caveman-${intent}`);
-parts.push(intent === "code" ? CAVEMAN_CODE_ANCHOR : CAVEMAN_CHAT_ANCHOR);
+status("mode", MODE_NAME[intent]);
+parts.push(intent === "code" ? PONYTAIL_CODE_ANCHOR : CAVEMAN_CHAT_ANCHOR);
 
-// 2. Mode skill body (caveman-code or caveman-chat rules)
+// 2. Mode skill body (ponytail-code or caveman-chat rules)
 const modeSkillBody = loadModeSkill(intent);
 if (modeSkillBody) {
   const compressed = compressContent(modeSkillBody);
   const saved = modeSkillBody.length - compressed.length;
-  status("rules", `caveman-${intent} loaded (${saved > 0 ? `-${saved}ch` : "no change"})`);
-  parts.push(`[MODE: caveman-${intent}]\n${compressed}`);
+  status("rules", `${MODE_NAME[intent]} loaded (${saved > 0 ? `-${saved}ch` : "no change"})`);
+  parts.push(`[MODE: ${MODE_NAME[intent]}]\n${compressed}`);
 } else {
-  status("rules", `caveman-${intent} (built-in anchor only)`);
+  status("rules", `${MODE_NAME[intent]} (built-in anchor only)`);
 }
 
 // 3. Best matching installed skill
@@ -252,6 +259,13 @@ if (finderResult && finderResult.selected_skill_path) {
     selectedSkillName = match.name;
     selectedSkillScore = match.score;
   }
+}
+
+// Mode skills already injected in step 2 — don't double-inject via auto-skill
+const MODE_SKILLS = new Set(["caveman-code", "caveman-chat", "ponytail-code", "caveman", "ponytail"]);
+if (MODE_SKILLS.has(selectedSkillName)) {
+  selectedSkillContent = "";
+  selectedSkillName = "";
 }
 
 if (selectedSkillContent && selectedSkillName) {
